@@ -3,7 +3,7 @@ We use bcrypt so that the users password can be hashed before storing the DB
 Reference: https://www.npmjs.com/package/bcrypt
 */
 const User = require('../models/user');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {

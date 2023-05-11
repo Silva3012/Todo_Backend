@@ -1,64 +1,51 @@
 const express = require('express');
 const router = express.Router();
-const Task = require('../models/task');
-const { validateJSON, checkLoggedIn, checkGmailAccount, checkTaskTitleLimit } = require('../middleware');
+const taskController = require('../controllers/taskController');
+const { validateJSON, checkLoggedIn, checkGmailAccount, checkTaskTitleLimit } = require('./middleware');
 
 // GET all tasks
-router.get('/', checkLoggedIn, (req, res) => {
-  Task.find({ user: req.user._id })
-    .then(tasks => res.json(tasks))
-    .catch(err => res.status(500).json({ message: err.message }));
+router.get('/', (req, res, next) => {
+  checkLoggedIn(req, res, () => {
+    taskController.getAllTasks(req, res, next);
+  });
 });
 
 // GET a specific task
-router.get('/:id', checkLoggedIn, (req, res) => {
-  Task.findOne({ _id: req.params.id, user: req.user._id })
-    .then(task => {
-      if (task) {
-        res.json(task);
-      } else {
-        res.status(404).json({ message: 'Task not found' });
-      }
-    })
-    .catch(err => res.status(500).json({ message: err.message }));
+router.get('/:id', (req, res, next) => {
+  checkLoggedIn(req, res, () => {
+    taskController.getTaskById(req, res, next);
+  });
 });
 
 // CREATE a new task
-router.post('/', validateJSON, checkLoggedIn, checkGmailAccount, checkTaskTitleLimit, (req, res) => {
-  const task = new Task({
-    title: req.body.title,
-    description: req.body.description,
-    user: req.user._id
+router.post('/', (req, res, next) => {
+  validateJSON(req, res, () => {
+    checkLoggedIn(req, res, () => {
+      checkGmailAccount(req, res, () => {
+        checkTaskTitleLimit(req, res, () => {
+          taskController.createTask(req, res, next);
+        });
+      });
+    });
   });
-  task.save()
-    .then(result => res.json(result))
-    .catch(err => res.status(400).json({ message: err.message }));
 });
 
 // UPDATE an existing task
-router.patch('/:id', validateJSON, checkLoggedIn, checkTaskTitleLimit, (req, res) => {
-  Task.findOneAndUpdate({ _id: req.params.id, user: req.user._id }, req.body, { new: true })
-    .then(task => {
-      if (task) {
-        res.json(task);
-      } else {
-        res.status(404).json({ message: 'Task not found' });
-      }
-    })
-    .catch(err => res.status(400).json({ message: err.message }));
+router.patch('/:id', (req, res, next) => {
+  validateJSON(req, res, () => {
+    checkLoggedIn(req, res, () => {
+      checkTaskTitleLimit(req, res, () => {
+        taskController.updateTask(req, res, next);
+      });
+    });
+  });
 });
 
 // DELETE a task
-router.delete('/:id', checkLoggedIn, (req, res) => {
-  Task.findOneAndDelete({ _id: req.params.id, user: req.user._id })
-    .then(task => {
-      if (task) {
-        res.json({ message: 'Task deleted' });
-      } else {
-        res.status(404).json({ message: 'Task not found' });
-      }
-    })
-    .catch(err => res.status(500).json({ message: err.message }));
+router.delete('/:id', (req, res, next) => {
+  checkLoggedIn(req, res, () => {
+    taskController.deleteTask(req, res, next);
+  });
 });
 
 module.exports = router;
