@@ -28,6 +28,24 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
+// Get a task by ID
+exports.getTaskById = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    res.json(task);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
 // Update a task
 exports.updateTask = async (req, res) => {
   try {

@@ -1,24 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
-const { validateJSON, checkLoggedIn, checkGmailAccount, checkTaskTitleLimit } = require('./middleware');
+const { validateJSON, checkLoggedIn, checkGmailAccount, checkTaskTitleLimit, verifyToken } = require('./middleware');
 
 // GET all tasks
-router.get('/', (req, res, next) => {
+router.get('/', verifyToken, validateJSON, (req, res, next) => {
   checkLoggedIn(req, res, () => {
     taskController.getAllTasks(req, res, next);
   });
 });
 
+
 // GET a specific task
-router.get('/:id', (req, res, next) => {
+router.get('/:id', verifyToken, (req, res, next) => {
   checkLoggedIn(req, res, () => {
     taskController.getTaskById(req, res, next);
   });
 });
 
 // CREATE a new task
-router.post('/', (req, res, next) => {
+router.post('/', verifyToken, (req, res, next) => {
   validateJSON(req, res, () => {
     checkLoggedIn(req, res, () => {
       checkGmailAccount(req, res, () => {
@@ -31,7 +32,7 @@ router.post('/', (req, res, next) => {
 });
 
 // UPDATE an existing task
-router.patch('/:id', (req, res, next) => {
+router.patch('/:id', verifyToken, (req, res, next) => {
   validateJSON(req, res, () => {
     checkLoggedIn(req, res, () => {
       checkTaskTitleLimit(req, res, () => {

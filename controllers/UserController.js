@@ -5,10 +5,12 @@ Reference: https://www.npmjs.com/package/bcrypt
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const config = require('../config');
+
 
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
 
     // Check if user with same email exists
     const existingUser = await User.findOne({ email });
@@ -22,7 +24,6 @@ const register = async (req, res) => {
 
     // Create the user
     const user = await User.create({
-      username,
       email,
       password: hashedPassword
     });
@@ -51,7 +52,7 @@ const login = async (req, res) => {
     }
 
     // Generate a token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, config.secretKey, {
       expiresIn: '1d'
     });
 
