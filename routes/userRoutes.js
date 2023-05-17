@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/UserController');
-const { validateJSON } = require('./middleware');
+const { validateJSON, checkGmailAccount } = require('./middleware');
 
 // Register a new user
-router.post('/register', validateJSON, userController.register);
+router.post('/register', validateJSON, checkGmailAccount, userController.register);
 
 // Login a user
-router.post('/login', validateJSON, userController.login);
+router.post('/login', validateJSON, checkGmailAccount, userController.login);
 
 module.exports = router;

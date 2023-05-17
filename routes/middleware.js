@@ -1,5 +1,5 @@
 // Importing the jsonwebtoken library to verify JWT tokens
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // Need this so that I can access the email field
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
@@ -10,34 +10,6 @@ const validateJSON = (req, res, next) => {
   }
   next();
 };
-
-// // Middleware function to verify the authenticity of a JWT token
-// const verifyToken = (req, res, next) => {
-//     // Checking the Authorization header for the presence of a JWT token
-//   const authHeader = req.headers.authorization;
-//   if (authHeader) {
-//     // Extracting the token from the Authorization header
-//     const token = authHeader.split(' ')[1];
-//     // Verifying the token
-//     jwt.verify(token, config.secretKey, (err, decoded) => {
-//       if (err) {
-//         return res.status(403).json({ message: 'Forbidden: invalid or expired token' });
-//       }
-      
-//       // Log the decoded token payload
-//       console.log(decoded);
-//       // Storing the decoded token payload in the request object
-//       req.user = {
-//         _id: decoded.userId,
-//         email: decoded.email
-//       };
-//       console.log('User:', req.user);
-//       next();
-//     });
-//   } else {
-//     return res.status(401).json({ message: 'Unauthorized: no token provided' });
-//   }
-// };
 
 // Middleware function to verify the authenticity of a JWT token
 const verifyToken = (req, res, next) => {
@@ -80,13 +52,15 @@ const checkLoggedIn = (req, res, next) => {
 
 // Middleware function to check if a user has a Gmail account
 const checkGmailAccount = (req, res, next) => {
-  const { userId } = req.user;
+  const email = req.body.email;
 
-  if (!req.user.email.endsWith('@gmail.com')) {
-    return res.status(403).json({ message: 'Forbidden: only Gmail accounts allowed' });
+  if (!email.endsWith('@gmail.com')) {
+    return res.status(400).json({ message: 'Only Gmail accounts are allowed' });
   }
+
   next();
 };
+
 
 // Middleware function to check if a task title is within the character limit
 const checkTaskTitleLimit = (req, res, next) => {

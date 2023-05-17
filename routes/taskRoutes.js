@@ -43,7 +43,7 @@ router.patch('/:id', verifyToken, (req, res, next) => {
 });
 
 // DELETE a task
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', verifyToken, checkGmailAccount, (req, res, next) => {
   checkLoggedIn(req, res, () => {
     taskController.deleteTask(req, res, next);
   });
