@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
-const { validateJSON, checkLoggedIn, checkGmailAccount, checkTaskTitleLimit, verifyToken } = require('./middleware');
+const { validateJSON, checkLoggedIn, checkTaskTitleLimit, verifyToken } = require('./middleware');
 
 // GET all tasks
 router.get('/', verifyToken, validateJSON, (req, res, next) => {
@@ -22,13 +22,11 @@ router.get('/:id', verifyToken, (req, res, next) => {
 router.post('/', verifyToken, (req, res, next) => {
   validateJSON(req, res, () => {
     checkLoggedIn(req, res, () => {
-      checkGmailAccount(req, res, () => {
         checkTaskTitleLimit(req, res, () => {
           taskController.createTask(req, res, next);
         });
       });
     });
-  });
 });
 
 // UPDATE an existing task
@@ -43,7 +41,7 @@ router.patch('/:id', verifyToken, (req, res, next) => {
 });
 
 // DELETE a task
-router.delete('/:id', verifyToken, checkGmailAccount, (req, res, next) => {
+router.delete('/:id', verifyToken, (req, res, next) => {
   checkLoggedIn(req, res, () => {
     taskController.deleteTask(req, res, next);
   });

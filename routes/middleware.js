@@ -50,12 +50,16 @@ const checkLoggedIn = (req, res, next) => {
   next();
 };
 
-// Middleware function to check if a user has a Gmail account
+// Middleware function to check if a user has a Gmail account.
+/*
+This middleware is only used in the userRoutes to satisfy this requirement:
+Respond with an HTTP 403 to all requests by users whose usernames don’t end with the substring ‘@gmail.com’.
+*/
 const checkGmailAccount = (req, res, next) => {
   const email = req.body.email;
 
   if (!email.endsWith('@gmail.com')) {
-    return res.status(400).json({ message: 'Only Gmail accounts are allowed' });
+    return res.status(403).json({ message: 'Only Gmail accounts are allowed' });
   }
 
   next();
